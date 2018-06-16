@@ -57,7 +57,7 @@ const Login = {
     },
     requests: {
         login(username, password, method) {
-            method = String(method).toLowerCase() || 'post';
+            method = method ? String(method).toLowerCase() : 'post';
             let body = {
                 'grant_type': 'password',
                 'client_id': Login.clientId,
@@ -66,10 +66,10 @@ const Login = {
             };
             body[Login.usernameField] = username;
             body[Login.passwordField] = password;
-            return this.instance[method](Login.loginURL, body)
+            return Login.instance[method](Login.loginURL, body)
         },
         refresh(refreshToken, method) {
-            method = String(method).toLowerCase() || 'post';
+            method = method ? String(method).toLowerCase() : 'post';
             let body = {
                 'grant_type': 'refresh_token',
                 'client_id': Login.clientId,
@@ -77,11 +77,11 @@ const Login = {
                 'refresh_token': refreshToken,
                 'scope': '*'
             };
-            return this.instance[method](Login.refreshURL, body)
+            return Login.instance[method](Login.refreshURL, body)
         },
         fetchProfile(method) {
-            method = String(method).toLowerCase() || 'get';
-            return this.instance[method](Login.profileFetchURL)
+            method = method ? String(method).toLowerCase() : 'get';
+            return Login.instance[method](Login.profileFetchURL)
         },
     },
     signIn(username, password) {
