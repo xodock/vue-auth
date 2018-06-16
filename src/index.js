@@ -19,7 +19,8 @@ const Login = {
         } else if (typeof this.instance.defaults === 'undefined') {
             this.instance = axios.create({});
         }
-        this.instance.defaults.baseURL = baseURL;
+        if (baseURL)
+            this.instance.defaults.baseURL = baseURL;
         if (token)
             this.instance.defaults.headers.authorization = "Bearer " + token;
         else
@@ -96,6 +97,9 @@ const Login = {
     mapLoginGetters() {
         return mapGetters(['profile', 'isLoggedIn', 'userId', 'expiresInFromNow'])
     },
+    getAxiosInstance() {
+        return Login.instance;
+    }
 };
 let Plugin = {
     install(Vue, {store, baseURL, client_id, client_secret, loginURL, refreshURL, profileFetchURL, usernameField, passwordField}) {
