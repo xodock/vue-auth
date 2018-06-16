@@ -1,5 +1,5 @@
 {
-  "name": "vue-auth",
+  "name": "vue-login",
   "version": "1.0.0",
   "description": "Authentication plugin for Vue.js",
   "main": "src/index.js",
@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xodock/vue-auth.git"
+    "url": "https://github.com/xodock/vue-login.git"
   },
   "author": "Lawstannis",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/xodock/vue-auth/issues"
+    "url": "https://github.com/xodock/vue-login/issues"
   },
-  "homepage": "https://github.com/xodock/vue-auth#readme"
+  "homepage": "https://github.com/xodock/vue-login#readme"
 }
