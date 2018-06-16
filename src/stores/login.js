@@ -87,7 +87,7 @@ const auth = {
             return new Promise((resolve, reject) => {
                 Vue.login.requests.login(username, password)
                     .then((data) => {
-                        dispatch('setAuthInfo', data.body)
+                        dispatch('setAuthInfo', data.data)
                             .then(() => {
                                 dispatch('fetchProfile')
                                     .then(() => {
@@ -116,7 +116,7 @@ const auth = {
             return new Promise((resolve, reject) => {
                 Vue.login.requests.refresh(getters.refreshToken)
                     .then((data) => {
-                        dispatch('setAuthInfo', data.body)
+                        dispatch('setAuthInfo', data.data)
                             .then(() => {
                                 dispatch('fetchProfile')
                                     .then(() => {
@@ -145,10 +145,10 @@ const auth = {
             return new Promise((resolve, reject) => {
                 Vue.login.requests.fetchProfile()
                     .then(response => {
-                        let profile = response.body.data;
+                        let profile = response.data;
                         if (profile) {
-                            commit('setProfile', response.body.data);
-                            resolve(response.body.data);
+                            commit('setProfile', response.data);
+                            resolve(response.data);
                         } else {
                             reject(response)
                         }
