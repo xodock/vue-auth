@@ -102,8 +102,8 @@ const Login = {
     }
 };
 let Plugin = {
-    install(Vue, {store, baseURL, client_id, client_secret, loginURL, refreshURL, profileFetchURL, usernameField, passwordField}) {
-        Login.patchInstance({baseURL});
+    install(Vue, {store, axios, baseURL, client_id, client_secret, loginURL, refreshURL, profileFetchURL, usernameField, passwordField}) {
+        Login.patchInstance({baseURL}, axios);
         Login.setURLs({loginURL, refreshURL, profileFetchURL});
         Login.setFieldNames({usernameField, passwordField});
         Login.setAPICredentials({client_id, client_secret});
@@ -112,13 +112,4 @@ let Plugin = {
     }
 };
 
-export default {
-    install(Vue, {store, baseURL, client_id, client_secret, loginURL, refreshURL, profileFetchURL, usernameField, passwordField}) {
-        Login.patchInstance({baseURL});
-        Login.setURLs({loginURL, refreshURL, profileFetchURL});
-        Login.setFieldNames({usernameField, passwordField});
-        Login.setAPICredentials({client_id, client_secret});
-        Login.patchStore(store);
-        Vue.prototype.$login = Vue.login = Login;
-    }
-};
+export default Plugin;
