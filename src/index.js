@@ -18,7 +18,7 @@ const Login = {
         this.instance = instance;
         if (baseURL)
             this.instance.defaults.baseURL = baseURL;
-        if (Login.store.getters.accessToken)
+        if (Login.store && Login.store.getters.accessToken)
             this.instance.defaults.headers.authorization = "Bearer " + Login.store.getters.accessToken;
         else
             delete this.instance.defaults.headers.authorization;
@@ -100,11 +100,11 @@ const Login = {
 };
 let Plugin = {
     install(Vue, {store, axios, baseURL, client_id, client_secret, loginURL, refreshURL, profileFetchURL, usernameField, passwordField}) {
+        Login.patchStore(store);
         Login.patchInstance({baseURL}, axios);
         Login.setURLs({loginURL, refreshURL, profileFetchURL});
         Login.setFieldNames({usernameField, passwordField});
         Login.setAPICredentials({client_id, client_secret});
-        Login.patchStore(store);
         Vue.prototype.$login = Vue.login = Login;
     }
 };
