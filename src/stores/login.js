@@ -42,7 +42,7 @@ const auth = {
     mutations: {
         setAccessToken(state, access_token) {
             state.access_token = access_token;
-            Vue.login.patchInstance({token: access_token}, Vue.login.instance);
+            Vue.login.patchInstance({}, Vue.login.instance);
         },
         setRefreshToken(state, refresh_token) {
             state.refresh_token = refresh_token;

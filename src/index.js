@@ -12,14 +12,14 @@ const Login = {
     passwordField: null,
     clientId: null,
     clientSecret: null,
-    patchInstance({baseURL, token}, instance) {
+    patchInstance({baseURL}, instance) {
         if (!instance)
             throw new Error("Please, provide an axios instance!");
         this.instance = instance;
         if (baseURL)
             this.instance.defaults.baseURL = baseURL;
-        if (token)
-            this.instance.defaults.headers.authorization = "Bearer " + token;
+        if (Login.store.getters.accessToken)
+            this.instance.defaults.headers.authorization = "Bearer " + Login.store.getters.accessToken;
         else
             delete this.instance.defaults.headers.authorization;
         return this.instance;
