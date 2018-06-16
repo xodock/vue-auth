@@ -1,4 +1,3 @@
-import axios from 'axios'
 import VueLoginStoreModule from './stores/login'
 import VuexPersistence from 'vuex-persist';
 import {mapGetters} from 'vuex';
@@ -14,11 +13,9 @@ const Login = {
     clientId: null,
     clientSecret: null,
     patchInstance({baseURL, token}, instance) {
-        if (typeof instance !== 'undefined') {
-            this.instance = instance
-        } else if (typeof this.instance.defaults === 'undefined') {
-            this.instance = axios.create({});
-        }
+        if (!instance)
+            throw new Error("Please, provide axios instance");
+        this.instance = instance;
         if (baseURL)
             this.instance.defaults.baseURL = baseURL;
         if (token)
