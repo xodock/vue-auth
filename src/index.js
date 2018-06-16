@@ -4,7 +4,7 @@ import VuexPersistence from 'vuex-persist';
 import {mapGetters} from 'vuex';
 
 const Login = {
-    instance: axios.create({}),
+    instance: null,
     store: null,
     loginURL: null,
     refreshURL: null,
