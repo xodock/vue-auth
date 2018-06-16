@@ -14,7 +14,7 @@ const Login = {
     clientSecret: null,
     patchInstance({baseURL, token}, instance) {
         if (!instance)
-            throw new Error("Please, provide axios instance");
+            throw new Error("Please, provide an axios instance!");
         this.instance = instance;
         if (baseURL)
             this.instance.defaults.baseURL = baseURL;
