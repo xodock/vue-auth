@@ -18,13 +18,13 @@ const auth = {
     tokenIssuedAt(state, getters) {
       return state.issued_at;
     },
-    tokenExpiresIn(state, getters) {
+    tokenLifeTime(state, getters) {
       return state.expires_in;
     },
     tokenExpiresAt(state, getters) {
-      if (!getters.tokenIssuedAt || !getters.tokenExpiresIn)
+      if (!getters.tokenIssuedAt || !getters.tokenLifeTime)
         return 0;
-      return getters.tokenIssuedAt + getters.tokenExpiresIn;
+      return getters.tokenIssuedAt + getters.tokenLifeTime;
     },
     tokenExpiresInFromNow(state, getters) {
       if (!getters.tokenExpiresAt)
@@ -46,7 +46,7 @@ const auth = {
   mutations: {
     setAccessToken(state, access_token) {
       state.access_token = access_token;
-      Vue.login.patchInstance({}, Vue.login.instance);
+      Vue.login.patchInstance(Vue.login.instance);
     },
     setRefreshToken(state, refresh_token) {
       state.refresh_token = refresh_token;
@@ -150,10 +150,10 @@ const auth = {
       return new Promise((resolve, reject) => {
         Vue.login.requests.fetchProfile()
           .then(response => {
-            let profile = response.data;
+            let profile = response.data.data;
             if (profile) {
-              commit('setProfile', response.data);
-              resolve(response.data);
+              commit('setProfile', response.data.data);
+              resolve(response.data.data);
             } else {
               reject(response)
             }
