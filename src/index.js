@@ -1,44 +1,38 @@
 import VueLoginStoreModule from './stores/login'
-import VuexPersistence from 'vuex-persist';
 import {mapGetters} from 'vuex';
+import axiosHttpDriver from './httpDrivers/axios'
+import passportApiDriver from './apiDrivers/passport'
+import localStoragePersistDriver from './persistDrivers/localStorage'
 
 const Login = {
-  instance: null,
+  persistDriver: null,
+  apiDriver: null,
+  httpDriver: null,
+  httpInstance: null,
   store: null,
   loginURL: null,
   refreshURL: null,
+  logoutURL: null,
   profileFetchURL: null,
+  processProfileResponse: null,
   usernameField: null,
   passwordField: null,
   clientId: null,
   clientSecret: null,
-  patchInstance(instance) {
-    if (!instance)
-      throw new Error("Please, provide an axios instance!");
-    this.instance = instance;
-    if (Login.store && Login.store.getters.accessToken)
-      this.instance.defaults.headers.Authorization = "Bearer " + Login.store.getters.accessToken;
-    else
-      delete this.instance.defaults.headers.Authorization;
-    return this.instance;
+  patchInstance(accessToken) {
+    return this.httpInstance = this.httpDriver.patchInstance(this.httpInstance, accessToken);
   },
   patchStore(store) {
     if (!store)
       throw new Error("Please, provide Vuex store");
     this.store = store;
     this.store.registerModule('login', VueLoginStoreModule);
-    const vuexLocal = new VuexPersistence({
-      key: 'VueLoginStore',
-      storage: window.localStorage,
-      modules: ['login']
-    });
-    vuexLocal.plugin(this.store);
+    this.persistDriver.patchStore(this.store, 'login');
     return this.store;
   },
-  setURLs({loginURL, refreshURL, profileFetchURL}) {
-    if (!loginURL || !refreshURL || !profileFetchURL)
-      throw new Error("You should provide URLs to login, refresh token and fetch profile (relative to baseURL)");
+  setURLs({loginURL, refreshURL, logoutURL, profileFetchURL}) {
     this.loginURL = loginURL;
+    this.logoutURL = logoutURL;
     this.refreshURL = refreshURL;
     this.profileFetchURL = profileFetchURL;
   },
@@ -54,31 +48,17 @@ const Login = {
   },
   requests: {
     login(username, password, method) {
-      method = method ? String(method).toLowerCase() : 'post';
-      let body = {
-        'grant_type': 'password',
-        'client_id': Login.clientId,
-        'client_secret': Login.clientSecret,
-        'scope': '*'
-      };
-      body[Login.usernameField] = username;
-      body[Login.passwordField] = password;
-      return Login.instance[method](Login.loginURL, body)
+      return Login.apiDriver.login(username, password, Login.clientId, Login.clientSecret, Login.loginURL, method)
+    },
+    logout(accessToken, method) {
+      return Login.apiDriver.logout(accessToken, Login.logoutURL, method)
     },
     refresh(refreshToken, method) {
-      method = method ? String(method).toLowerCase() : 'post';
-      let body = {
-        'grant_type': 'refresh_token',
-        'client_id': Login.clientId,
-        'client_secret': Login.clientSecret,
-        'refresh_token': refreshToken,
-        'scope': '*'
-      };
-      return Login.instance[method](Login.refreshURL, body)
+      return Login.apiDriver.refresh(refreshToken, Login.clientId, Login.clientSecret, Login.refreshURL, method)
     },
     fetchProfile(method) {
       method = method ? String(method).toLowerCase() : 'get';
-      return Login.instance[method](Login.profileFetchURL)
+      return Login.httpDriver.methods[method](Login.httpInstance)(Login.profileFetchURL)
     },
   },
   signIn(username, password) {
@@ -94,14 +74,25 @@ const Login = {
     return mapGetters(['profile', 'isLoggedIn', 'userId', 'tokenExpiresInFromNow'])
   },
   getAxiosInstance() {
-    return Login.instance;
+    return Login.httpInstance;
   }
 };
 let Plugin = {
-  install(Vue, {store, axios, client_id, client_secret, loginURL, refreshURL, profileFetchURL, usernameField, passwordField}) {
+  install(Vue, {store, axios, client_id, client_secret, loginURL, refreshURL, logoutURL, profileFetchURL, usernameField, passwordField, processProfileResponse}) {
+    if (axios) {
+      Login.httpInstance = axios;
+      Login.httpDriver = axiosHttpDriver;
+    }
+    if (true) {//TODO:: implement driver definition logic
+      Login.persistDriver = localStoragePersistDriver;
+    }
+    if (true) {//TODO:: implement driver definition logic
+      Login.apiDriver = passportApiDriver;
+    }
+    Login.processProfileResponse = (typeof processProfileResponse !== 'undefined') ? processProfileResponse : ((response) => Login.httpDriver.responseData(response).data);
+    Login.patchInstance();
     Login.patchStore(store);
-    Login.patchInstance(axios);
-    Login.setURLs({loginURL, refreshURL, profileFetchURL});
+    Login.setURLs({loginURL, refreshURL, logoutURL, profileFetchURL});
     Login.setFieldNames({usernameField, passwordField});
     Login.setAPICredentials({client_id, client_secret});
     Vue.prototype.$login = Vue.login = Login;

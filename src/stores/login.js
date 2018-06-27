@@ -46,7 +46,7 @@ const auth = {
   mutations: {
     setAccessToken(state, access_token) {
       state.access_token = access_token;
-      Vue.login.patchInstance(Vue.login.instance);
+      Vue.login.patchInstance(access_token);
     },
     setRefreshToken(state, refresh_token) {
       state.refresh_token = refresh_token;
@@ -62,12 +62,12 @@ const auth = {
     }
   },
   actions: {
-    setAuthInfo({commit}, {access_token, refresh_token, expires_in}) {
+    setAuthInfo({commit}, {access_token, refresh_token, expires_in, issued_at}) {
       return new Promise((resolve, reject) => {
         commit('setAccessToken', access_token);
         commit('setRefreshToken', refresh_token);
         commit('setExpiresIn', expires_in);
-        commit('setIssuedAt', (Date.now() / 1000));
+        commit('setIssuedAt', issued_at);
         resolve()
       })
     },
@@ -81,18 +81,22 @@ const auth = {
         resolve();
       })
     },
-    logout({commit, dispatch}) {
+    logout({commit, dispatch, getters}) {
       return new Promise((resolve, reject) => {
-        dispatch('clearAuthInfo').then(() => {
-          resolve();
-        });
+        Vue.login.requests.logout(getters.accessToken)
+          .then(() => {
+            dispatch('clearAuthInfo')
+              .then(() => {
+                resolve();
+              });
+          })
       });
     },
     login({commit, dispatch}, {username, password}) {
       return new Promise((resolve, reject) => {
         Vue.login.requests.login(username, password)
-          .then((data) => {
-            dispatch('setAuthInfo', data.data)
+          .then((response) => {
+            dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
               .then(() => {
                 dispatch('fetchProfile')
                   .then(() => {
@@ -120,8 +124,8 @@ const auth = {
     authRefresh({commit, dispatch, getters}) {
       return new Promise((resolve, reject) => {
         Vue.login.requests.refresh(getters.refreshToken)
-          .then((data) => {
-            dispatch('setAuthInfo', data.data)
+          .then((response) => {
+            dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
               .then(() => {
                 dispatch('fetchProfile')
                   .then(() => {
@@ -150,10 +154,10 @@ const auth = {
       return new Promise((resolve, reject) => {
         Vue.login.requests.fetchProfile()
           .then(response => {
-            let profile = response.data.data;
+            let profile = Vue.login.processProfileResponse(response);
             if (profile) {
-              commit('setProfile', response.data.data);
-              resolve(response.data.data);
+              commit('setProfile', profile);
+              resolve(profile);
             } else {
               reject(response)
             }
