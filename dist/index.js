@@ -10,49 +10,55 @@ var _login = require('./stores/login');
 
 var _login2 = _interopRequireDefault(_login);
 
-var _vuexPersist = require('vuex-persist');
-
-var _vuexPersist2 = _interopRequireDefault(_vuexPersist);
-
 var _vuex = require('vuex');
+
+var _axios = require('./httpDrivers/axios');
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _passport = require('./apiDrivers/passport');
+
+var _passport2 = _interopRequireDefault(_passport);
+
+var _localStorage = require('./persistDrivers/localStorage');
+
+var _localStorage2 = _interopRequireDefault(_localStorage);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Login = {
-  instance: null,
+  persistDriver: null,
+  apiDriver: null,
+  httpDriver: null,
+  httpInstance: null,
   store: null,
   loginURL: null,
   refreshURL: null,
+  logoutURL: null,
   profileFetchURL: null,
+  processProfileResponse: null,
   usernameField: null,
   passwordField: null,
   clientId: null,
   clientSecret: null,
-  patchInstance: function patchInstance(instance) {
-    if (!instance) throw new Error("Please, provide an axios instance!");
-    this.instance = instance;
-    if (Login.store && Login.store.getters.accessToken) this.instance.defaults.headers.Authorization = "Bearer " + Login.store.getters.accessToken;else delete this.instance.defaults.headers.Authorization;
-    return this.instance;
+  patchInstance: function patchInstance(accessToken) {
+    return this.httpInstance = this.httpDriver.patchInstance(this.httpInstance, accessToken);
   },
   patchStore: function patchStore(store) {
     if (!store) throw new Error("Please, provide Vuex store");
     this.store = store;
     this.store.registerModule('login', _login2.default);
-    var vuexLocal = new _vuexPersist2.default({
-      key: 'VueLoginStore',
-      storage: window.localStorage,
-      modules: ['login']
-    });
-    vuexLocal.plugin(this.store);
+    this.persistDriver.patchStore(this.store, 'login');
     return this.store;
   },
   setURLs: function setURLs(_ref) {
     var loginURL = _ref.loginURL,
         refreshURL = _ref.refreshURL,
+        logoutURL = _ref.logoutURL,
         profileFetchURL = _ref.profileFetchURL;
 
-    if (!loginURL || !refreshURL || !profileFetchURL) throw new Error("You should provide URLs to login, refresh token and fetch profile (relative to baseURL)");
     this.loginURL = loginURL;
+    this.logoutURL = logoutURL;
     this.refreshURL = refreshURL;
     this.profileFetchURL = profileFetchURL;
   },
@@ -74,31 +80,17 @@ var Login = {
 
   requests: {
     login: function login(username, password, method) {
-      method = method ? String(method).toLowerCase() : 'post';
-      var body = {
-        'grant_type': 'password',
-        'client_id': Login.clientId,
-        'client_secret': Login.clientSecret,
-        'scope': '*'
-      };
-      body[Login.usernameField] = username;
-      body[Login.passwordField] = password;
-      return Login.instance[method](Login.loginURL, body);
+      return Login.apiDriver.login(username, password, Login.clientId, Login.clientSecret, Login.loginURL, method);
+    },
+    logout: function logout(accessToken, method) {
+      return Login.apiDriver.logout(accessToken, Login.logoutURL, method);
     },
     refresh: function refresh(refreshToken, method) {
-      method = method ? String(method).toLowerCase() : 'post';
-      var body = {
-        'grant_type': 'refresh_token',
-        'client_id': Login.clientId,
-        'client_secret': Login.clientSecret,
-        'refresh_token': refreshToken,
-        'scope': '*'
-      };
-      return Login.instance[method](Login.refreshURL, body);
+      return Login.apiDriver.refresh(refreshToken, Login.clientId, Login.clientSecret, Login.refreshURL, method);
     },
     fetchProfile: function fetchProfile(method) {
       method = method ? String(method).toLowerCase() : 'get';
-      return Login.instance[method](Login.profileFetchURL);
+      return Login.httpDriver.methods[method](Login.httpInstance)(Login.profileFetchURL);
     }
   },
   signIn: function signIn(username, password) {
@@ -114,7 +106,7 @@ var Login = {
     return (0, _vuex.mapGetters)(['profile', 'isLoggedIn', 'userId', 'tokenExpiresInFromNow']);
   },
   getAxiosInstance: function getAxiosInstance() {
-    return Login.instance;
+    return Login.httpInstance;
   }
 };
 var Plugin = {
@@ -125,13 +117,30 @@ var Plugin = {
         client_secret = _ref4.client_secret,
         loginURL = _ref4.loginURL,
         refreshURL = _ref4.refreshURL,
+        logoutURL = _ref4.logoutURL,
         profileFetchURL = _ref4.profileFetchURL,
         usernameField = _ref4.usernameField,
-        passwordField = _ref4.passwordField;
+        passwordField = _ref4.passwordField,
+        processProfileResponse = _ref4.processProfileResponse;
 
+    if (axios) {
+      Login.httpInstance = axios;
+      Login.httpDriver = _axios2.default;
+    }
+    if (true) {
+      //TODO:: implement driver definition logic
+      Login.persistDriver = _localStorage2.default;
+    }
+    if (true) {
+      //TODO:: implement driver definition logic
+      Login.apiDriver = _passport2.default;
+    }
+    Login.processProfileResponse = typeof processProfileResponse !== 'undefined' ? processProfileResponse : function (response) {
+      return Login.httpDriver.responseData(response).data;
+    };
+    Login.patchInstance();
     Login.patchStore(store);
-    Login.patchInstance(axios);
-    Login.setURLs({ loginURL: loginURL, refreshURL: refreshURL, profileFetchURL: profileFetchURL });
+    Login.setURLs({ loginURL: loginURL, refreshURL: refreshURL, logoutURL: logoutURL, profileFetchURL: profileFetchURL });
     Login.setFieldNames({ usernameField: usernameField, passwordField: passwordField });
     Login.setAPICredentials({ client_id: client_id, client_secret: client_secret });
     Vue.prototype.$login = Vue.login = Login;

@@ -54,7 +54,7 @@ var auth = {
   mutations: {
     setAccessToken: function setAccessToken(state, access_token) {
       state.access_token = access_token;
-      _vue2.default.login.patchInstance(_vue2.default.login.instance);
+      _vue2.default.login.patchInstance(access_token);
     },
     setRefreshToken: function setRefreshToken(state, refresh_token) {
       state.refresh_token = refresh_token;
@@ -74,13 +74,14 @@ var auth = {
       var commit = _ref.commit;
       var access_token = _ref2.access_token,
           refresh_token = _ref2.refresh_token,
-          expires_in = _ref2.expires_in;
+          expires_in = _ref2.expires_in,
+          issued_at = _ref2.issued_at;
 
       return new Promise(function (resolve, reject) {
         commit('setAccessToken', access_token);
         commit('setRefreshToken', refresh_token);
         commit('setExpiresIn', expires_in);
-        commit('setIssuedAt', Date.now() / 1000);
+        commit('setIssuedAt', issued_at);
         resolve();
       });
     },
@@ -98,11 +99,14 @@ var auth = {
     },
     logout: function logout(_ref4) {
       var commit = _ref4.commit,
-          dispatch = _ref4.dispatch;
+          dispatch = _ref4.dispatch,
+          getters = _ref4.getters;
 
       return new Promise(function (resolve, reject) {
-        dispatch('clearAuthInfo').then(function () {
-          resolve();
+        _vue2.default.login.requests.logout(getters.accessToken).then(function () {
+          dispatch('clearAuthInfo').then(function () {
+            resolve();
+          });
         });
       });
     },
@@ -113,8 +117,8 @@ var auth = {
           password = _ref6.password;
 
       return new Promise(function (resolve, reject) {
-        _vue2.default.login.requests.login(username, password).then(function (data) {
-          dispatch('setAuthInfo', data.data).then(function () {
+        _vue2.default.login.requests.login(username, password).then(function (response) {
+          dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(function () {
             dispatch('fetchProfile').then(function () {
               resolve();
             }).catch(function () {
@@ -140,8 +144,8 @@ var auth = {
           getters = _ref7.getters;
 
       return new Promise(function (resolve, reject) {
-        _vue2.default.login.requests.refresh(getters.refreshToken).then(function (data) {
-          dispatch('setAuthInfo', data.data).then(function () {
+        _vue2.default.login.requests.refresh(getters.refreshToken).then(function (response) {
+          dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(function () {
             dispatch('fetchProfile').then(function () {
               resolve();
             }).catch(function () {
@@ -167,10 +171,10 @@ var auth = {
 
       return new Promise(function (resolve, reject) {
         _vue2.default.login.requests.fetchProfile().then(function (response) {
-          var profile = response.data.data;
+          var profile = _vue2.default.login.processProfileResponse(response);
           if (profile) {
-            commit('setProfile', response.data.data);
-            resolve(response.data.data);
+            commit('setProfile', profile);
+            resolve(profile);
           } else {
             reject(response);
           }
