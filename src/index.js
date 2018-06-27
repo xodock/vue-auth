@@ -20,7 +20,7 @@ const Login = {
   clientId: null,
   clientSecret: null,
   patchInstance(accessToken) {
-    return this.httpInstance = this.httpDriver.patchInstance(this.httpInstance, accessToken);
+    return this.httpInstance = this.httpDriver.patchInstance(this.httpInstance, Login.store.getters.accessToken);
   },
   patchStore(store) {
     if (!store)
@@ -90,12 +90,15 @@ let Plugin = {
       Login.apiDriver = passportApiDriver;
     }
     Login.processProfileResponse = (typeof processProfileResponse !== 'undefined') ? processProfileResponse : ((response) => Login.httpDriver.responseData(response).data);
-    Login.patchInstance();
     Login.patchStore(store);
+    Login.patchInstance();
     Login.setURLs({loginURL, refreshURL, logoutURL, profileFetchURL});
     Login.setFieldNames({usernameField, passwordField});
     Login.setAPICredentials({client_id, client_secret});
     Vue.prototype.$login = Vue.login = Login;
+    if (Vue.login.store.getters.isLoggedIn){
+      Login.refresh();
+    }
     Vue.mixin({
       computed: {
         ...Login.mapLoginGetters()

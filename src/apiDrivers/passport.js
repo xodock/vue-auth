@@ -40,12 +40,18 @@ export default {
     return Vue.login.httpDriver.methods[method](Vue.login.httpInstance)(url, body);
   },
   logout(access_token, url, method) {
-    if (!access_token) {
+    let jti = parseJwt(access_token).jti;
+    if (!jti) {
       return Promise.reject()
     }
-    url = url ? url : '/oauth/tokens/' + access_token;
+    url = url ? url : '/oauth/tokens/' + jti;
     method = method ? String(method).toLowerCase() : 'delete';
 
     return Vue.login.httpDriver.methods[method](Vue.login.httpInstance)(url);
   }
+}
+function parseJwt (token) {
+  let base64Url = token.split('.')[1];
+  let base64 = base64Url.replace('-', '+').replace('_', '/');
+  return JSON.parse(window.atob(base64));
 }
