@@ -42,7 +42,7 @@ var Login = {
   clientId: null,
   clientSecret: null,
   patchInstance: function patchInstance(accessToken) {
-    return this.httpInstance = this.httpDriver.patchInstance(this.httpInstance, accessToken);
+    return this.httpInstance = this.httpDriver.patchInstance(this.httpInstance, Login.store.getters.accessToken);
   },
   patchStore: function patchStore(store) {
     if (!store) throw new Error("Please, provide Vuex store");
@@ -138,12 +138,15 @@ var Plugin = {
     Login.processProfileResponse = typeof processProfileResponse !== 'undefined' ? processProfileResponse : function (response) {
       return Login.httpDriver.responseData(response).data;
     };
-    Login.patchInstance();
     Login.patchStore(store);
+    Login.patchInstance();
     Login.setURLs({ loginURL: loginURL, refreshURL: refreshURL, logoutURL: logoutURL, profileFetchURL: profileFetchURL });
     Login.setFieldNames({ usernameField: usernameField, passwordField: passwordField });
     Login.setAPICredentials({ client_id: client_id, client_secret: client_secret });
     Vue.prototype.$login = Vue.login = Login;
+    if (Vue.login.store.getters.isLoggedIn) {
+      Login.refresh();
+    }
     Vue.mixin({
       computed: _extends({}, Login.mapLoginGetters())
     });

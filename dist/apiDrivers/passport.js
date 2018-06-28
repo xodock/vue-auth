@@ -49,12 +49,19 @@ exports.default = {
     return _vue2.default.login.httpDriver.methods[method](_vue2.default.login.httpInstance)(url, body);
   },
   logout: function logout(access_token, url, method) {
-    if (!access_token) {
+    var jti = parseJwt(access_token).jti;
+    if (!jti) {
       return Promise.reject();
     }
-    url = url ? url : '/oauth/tokens/' + access_token;
+    url = url ? url : '/oauth/tokens/' + jti;
     method = method ? String(method).toLowerCase() : 'delete';
 
     return _vue2.default.login.httpDriver.methods[method](_vue2.default.login.httpInstance)(url);
   }
 };
+
+function parseJwt(token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace('-', '+').replace('_', '/');
+  return JSON.parse(window.atob(base64));
+}
