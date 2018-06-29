@@ -10,7 +10,7 @@ export default {
   },
 
   login(username, password, client_id, client_secret, url, method) {
-    url = url ? url : '/oauth/token';
+    url = url ? url : 'oauth/token';
     method = method ? String(method).toLowerCase() : 'post';
 
     let body = {
@@ -26,7 +26,7 @@ export default {
     return Vue.login.httpDriver.methods[method](Vue.login.httpInstance)(url, body);
   },
   refresh(refresh_token, client_id, client_secret, url, method) {
-    url = url ? url : '/oauth/token';
+    url = url ? url : 'oauth/token';
     method = method ? String(method).toLowerCase() : 'post';
 
     let body = {
@@ -44,7 +44,7 @@ export default {
     if (!jti) {
       return Promise.reject()
     }
-    url = url ? url : '/oauth/tokens/' + jti;
+    url = url ? url : 'oauth/tokens/' + jti;
     method = method ? String(method).toLowerCase() : 'delete';
 
     return Vue.login.httpDriver.methods[method](Vue.login.httpInstance)(url);
