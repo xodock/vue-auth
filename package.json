@@ -24,8 +24,7 @@
   },
   "homepage": "https://github.com/xodock/vue-login#readme",
   "dependencies": {
-    "circular-json": "^0.5.4",
-    "vuex-persist": "^1.4.0"
+    "vuex-persist": "^1.4.3"
   },
   "peerDependencies": {
     "axios": "^0.18.0",
