@@ -13,7 +13,9 @@ const constructor = function (instance) {
         responseData(response) {
             return response.data;
         },
-
+        getInstance() {
+            return instance;
+        },
         methods: {
             post: instance.post,
             get: instance.get,

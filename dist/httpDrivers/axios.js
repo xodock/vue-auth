@@ -13,7 +13,9 @@ var constructor = function constructor(instance) {
         responseData: function responseData(response) {
             return response.data;
         },
-
+        getInstance: function getInstance() {
+            return instance;
+        },
 
         methods: {
             post: instance.post,
