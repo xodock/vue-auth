@@ -58,7 +58,7 @@ const Login = {
         },
         fetchProfile(method) {
             method = method ? String(method).toLowerCase() : 'get';
-            return Login.httpDriver.methods[method](Login.profileFetchURL)
+            return (Login.httpDriver.methods[method])(Login.profileFetchURL)
         },
     },
     signIn(username, password) {

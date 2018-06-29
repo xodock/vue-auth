@@ -23,7 +23,7 @@ export default {
     body['username'] = username;
     body['password'] = password;
 
-    return Vue.login.httpDriver.methods[method](url, body);
+    return (Vue.login.httpDriver.methods[method])(url, body);
   },
   refresh(refresh_token, client_id, client_secret, url, method) {
     url = url ? url : 'oauth/token';
@@ -37,7 +37,7 @@ export default {
       'scope': '*'
     };
 
-    return Vue.login.httpDriver.methods[method](url, body);
+    return (Vue.login.httpDriver.methods[method])(url, body);
   },
   logout(access_token, url, method) {
     let jti = parseJwt(access_token).jti;
@@ -47,7 +47,7 @@ export default {
     url = url ? url : 'oauth/tokens/' + jti;
     method = method ? String(method).toLowerCase() : 'delete';
 
-    return Vue.login.httpDriver.methods[method](url);
+    return (Vue.login.httpDriver.methods[method])(url);
   }
 }
 function parseJwt (token) {
