@@ -16,15 +16,9 @@ var constructor = function constructor(instance) {
 
 
         methods: {
-            post: function post() {
-                return instance.post;
-            },
-            get: function get() {
-                return instance.post;
-            },
-            delete: function _delete() {
-                return instance.delete;
-            }
+            post: instance.post,
+            get: instance.get,
+            delete: instance.delete
         }
     };
 };

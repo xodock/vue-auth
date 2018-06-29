@@ -15,15 +15,9 @@ const constructor = function (instance){
         },
 
         methods: {
-            post: () => {
-                return instance.post
-            },
-            get: () => {
-                return instance.post
-            },
-            delete: () => {
-                return instance.delete
-            }
+            post: instance.post,
+            get: instance.get,
+            delete: instance.delete
         }
     }
 }
