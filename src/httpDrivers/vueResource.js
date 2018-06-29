@@ -15,13 +15,13 @@ const constructor = function (instance){
         },
 
         methods: {
-            post() {
+            post: () => {
                 return instance.post
             },
-            get() {
+            get: () => {
                 return instance.post
             },
-            delete() {
+            delete: () => {
                 return instance.delete
             }
         }

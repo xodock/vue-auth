@@ -1,4 +1,4 @@
-const constructor = function (instance){
+const constructor = function (instance) {
     if (!instance)
         throw new Error("Please, provide a valid vue-resource instance!");
     return {
@@ -15,13 +15,13 @@ const constructor = function (instance){
         },
 
         methods: {
-            post() {
+            post: () => {
                 return instance.post
             },
-            get() {
+            get: () => {
                 return instance.post
             },
-            delete() {
+            delete: () => {
                 return instance.delete
             }
         }
