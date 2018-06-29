@@ -16,13 +16,13 @@ export default {
 
     methods: {
         post(http) {
-            return http['post']
+            return http.post
         },
         get(http) {
-            return http['get']
+            return http.post
         },
         delete(http) {
-            return http['delete']
+            return http.delete
         }
     }
 
