@@ -90,7 +90,7 @@ var Login = {
         },
         fetchProfile: function fetchProfile(method) {
             method = method ? String(method).toLowerCase() : 'get';
-            return Login.httpDriver.instance()[method](Login.profileFetchURL);
+            return Login.httpDriver.getInstance()[method](Login.profileFetchURL);
         }
     },
     signIn: function signIn(username, password) {

@@ -32,7 +32,7 @@ exports.default = {
     body['username'] = username;
     body['password'] = password;
 
-    return _vue2.default.login.httpDriver.instance()[method](url, body);
+    return _vue2.default.login.httpDriver.getInstance()[method](url, body);
   },
   refresh: function refresh(refresh_token, client_id, client_secret, url, method) {
     url = url ? url : 'oauth/token';
@@ -46,7 +46,7 @@ exports.default = {
       'scope': '*'
     };
 
-    return _vue2.default.login.httpDriver.instance()[method](url, body);
+    return _vue2.default.login.httpDriver.getInstance()[method](url, body);
   },
   logout: function logout(access_token, url, method) {
     var jti = parseJwt(access_token).jti;
@@ -56,7 +56,7 @@ exports.default = {
     url = url ? url : 'oauth/tokens/' + jti;
     method = method ? String(method).toLowerCase() : 'delete';
 
-    return _vue2.default.login.httpDriver.instance()[method](url);
+    return _vue2.default.login.httpDriver.getInstance()[method](url);
   }
 };
 
