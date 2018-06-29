@@ -41,8 +41,8 @@ var Login = {
     passwordField: null,
     clientId: null,
     clientSecret: null,
-    patchInstance: function patchInstance(accessToken) {
-        return this.httpInstance = this.httpDriver.patchInstance(this.httpInstance, Login.store.getters.accessToken);
+    patchInstance: function patchInstance() {
+        return this.httpInstance = this.httpDriver.patchInstance(Login.store.getters.accessToken);
     },
     patchStore: function patchStore(store) {
         if (!store) throw new Error("Please, provide Vuex store");
@@ -90,7 +90,7 @@ var Login = {
         },
         fetchProfile: function fetchProfile(method) {
             method = method ? String(method).toLowerCase() : 'get';
-            return Login.httpDriver.methods[method](Login.httpInstance)(Login.profileFetchURL);
+            return Login.httpDriver.methods[method](Login.profileFetchURL);
         }
     },
     signIn: function signIn(username, password) {
@@ -127,11 +127,11 @@ var Plugin = {
 
         if (axios) {
             Login.httpInstance = axios;
-            Login.httpDriver = _axios2.default;
+            Login.httpDriver = (0, _axios2.default)(Login.httpInstance);
         } else if (http) {
             Login.httpInstance = http;
         }
-        if (!httpDriver) Login.httpDriver = _axios2.default;else Login.httpDriver = httpDriver;
+        if (!httpDriver) Login.httpDriver = (0, _axios2.default)(Login.httpInstance);else Login.httpDriver = httpDriver(Login.httpInstance);
         if (true) {
             //TODO:: implement driver definition logic
             Login.persistDriver = _localStorage2.default;

@@ -1,29 +1,30 @@
-export default {
+const constructor = function (instance){
+    if (!instance)
+        throw new Error("Please, provide a valid vue-resource instance!");
+    return {
+        patchInstance(accessToken) {
+            if (accessToken)
+                instance.defaults.headers.Authorization = "Bearer " + accessToken;
+            else
+                delete instance.defaults.headers.Authorization;
+            return instance;
+        },
 
-  patchInstance(axios, accessToken) {
-    if (!axios)
-      throw new Error("Please, provide a valid axios instance!");
-    if (accessToken)
-      axios.defaults.headers.Authorization = "Bearer " + accessToken;
-    else
-      delete axios.defaults.headers.Authorization;
-    return axios;
-  },
+        responseData(response) {
+            return response.data;
+        },
 
-  responseData(response) {
-    return response.data;
-  },
-
-  methods: {
-    post(axios) {
-      return axios['post']
-    },
-    get(axios) {
-      return axios['get']
-    },
-    delete(axios) {
-      return axios['delete']
+        methods: {
+            post() {
+                return instance.post
+            },
+            get() {
+                return instance.post
+            },
+            delete() {
+                return instance.delete
+            }
+        }
     }
-  }
-
 }
+export default constructor

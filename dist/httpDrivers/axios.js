@@ -1,29 +1,31 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
-exports.default = {
-  patchInstance: function patchInstance(axios, accessToken) {
-    if (!axios) throw new Error("Please, provide a valid axios instance!");
-    if (accessToken) axios.defaults.headers.Authorization = "Bearer " + accessToken;else delete axios.defaults.headers.Authorization;
-    return axios;
-  },
-  responseData: function responseData(response) {
-    return response.data;
-  },
+var constructor = function constructor(instance) {
+    if (!instance) throw new Error("Please, provide a valid vue-resource instance!");
+    return {
+        patchInstance: function patchInstance(accessToken) {
+            if (accessToken) instance.defaults.headers.Authorization = "Bearer " + accessToken;else delete instance.defaults.headers.Authorization;
+            return instance;
+        },
+        responseData: function responseData(response) {
+            return response.data;
+        },
 
 
-  methods: {
-    post: function post(axios) {
-      return axios['post'];
-    },
-    get: function get(axios) {
-      return axios['get'];
-    },
-    delete: function _delete(axios) {
-      return axios['delete'];
-    }
-  }
-
+        methods: {
+            post: function post() {
+                return instance.post;
+            },
+            get: function get() {
+                return instance.post;
+            },
+            delete: function _delete() {
+                return instance.delete;
+            }
+        }
+    };
 };
+exports.default = constructor;

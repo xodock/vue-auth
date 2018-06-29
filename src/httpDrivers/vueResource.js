@@ -1,29 +1,30 @@
-export default {
-
-    patchInstance(http, accessToken) {
-        if (!http)
-            throw new Error("Please, provide a valid vue-resource instance!");
-        if (accessToken)
-            http.headers.common['Authorization'] = 'Bearer ' + accessToken;
-        else
-            delete http.headers.common.Authorization;
-        return http;
-    },
-
-    responseData(response) {
-        return response.body;
-    },
-
-    methods: {
-        post(http) {
-            return http.post
+const constructor = function (instance){
+    if (!instance)
+        throw new Error("Please, provide a valid vue-resource instance!");
+    return {
+        patchInstance(accessToken) {
+            if (accessToken)
+                instance.headers.common['Authorization'] = 'Bearer ' + accessToken;
+            else
+                delete instance.headers.common.Authorization;
+            return instance;
         },
-        get(http) {
-            return http.post
+
+        responseData(response) {
+            return response.body;
         },
-        delete(http) {
-            return http.delete
+
+        methods: {
+            post() {
+                return instance.post
+            },
+            get() {
+                return instance.post
+            },
+            delete() {
+                return instance.delete
+            }
         }
     }
-
 }
+export default constructor
