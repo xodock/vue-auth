@@ -130,8 +130,8 @@ var Plugin = {
             Login.httpDriver = (0, _axios2.default)(Login.httpInstance);
         } else if (http) {
             Login.httpInstance = http;
+            if (!httpDriver) Login.httpDriver = (0, _axios2.default)(Login.httpInstance);else Login.httpDriver = httpDriver(Login.httpInstance);
         }
-        if (!httpDriver) Login.httpDriver = (0, _axios2.default)(Login.httpInstance);else Login.httpDriver = httpDriver(Login.httpInstance);
         if (true) {
             //TODO:: implement driver definition logic
             Login.persistDriver = _localStorage2.default;
