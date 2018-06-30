@@ -4,14 +4,14 @@ const constructor = function (instance) {
     return {
         patchInstance(accessToken) {
             if (accessToken)
-                instance.defaults.headers.Authorization = "Bearer " + accessToken;
+                instance.headers.common['Authorization'] = 'Bearer ' + accessToken;
             else
-                delete instance.defaults.headers.Authorization;
+                delete instance.headers.common.Authorization;
             return instance;
         },
 
         responseData(response) {
-            return response.data;
+            return response.body;
         },
         getInstance() {
             return instance;

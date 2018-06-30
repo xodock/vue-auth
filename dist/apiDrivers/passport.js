@@ -19,7 +19,7 @@ exports.default = {
     return { access_token: access_token, refresh_token: refresh_token, expires_in: expires_in, issued_at: issued_at };
   },
   login: function login(username, password, client_id, client_secret, url, method) {
-    url = url ? url : '/oauth/token';
+    url = url ? url : 'oauth/token';
     method = method ? String(method).toLowerCase() : 'post';
 
     var body = {
@@ -32,10 +32,10 @@ exports.default = {
     body['username'] = username;
     body['password'] = password;
 
-    return _vue2.default.login.httpDriver.methods[method](_vue2.default.login.httpInstance)(url, body);
+    return _vue2.default.login.httpDriver.getInstance()[method](url, body);
   },
   refresh: function refresh(refresh_token, client_id, client_secret, url, method) {
-    url = url ? url : '/oauth/token';
+    url = url ? url : 'oauth/token';
     method = method ? String(method).toLowerCase() : 'post';
 
     var body = {
@@ -46,17 +46,17 @@ exports.default = {
       'scope': '*'
     };
 
-    return _vue2.default.login.httpDriver.methods[method](_vue2.default.login.httpInstance)(url, body);
+    return _vue2.default.login.httpDriver.getInstance()[method](url, body);
   },
   logout: function logout(access_token, url, method) {
     var jti = parseJwt(access_token).jti;
     if (!jti) {
       return Promise.reject();
     }
-    url = url ? url : '/oauth/tokens/' + jti;
+    url = url ? url : 'oauth/tokens/' + jti;
     method = method ? String(method).toLowerCase() : 'delete';
 
-    return _vue2.default.login.httpDriver.methods[method](_vue2.default.login.httpInstance)(url);
+    return _vue2.default.login.httpDriver.getInstance()[method](url);
   }
 };
 
