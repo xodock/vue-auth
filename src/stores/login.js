@@ -99,11 +99,11 @@ const auth = {
             dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
               .then(() => {
                 dispatch('fetchProfile')
-                  .then(() => {
-                    resolve();
+                  .then((response) => {
+                    resolve(response);
                   })
-                  .catch(() => {
-                    reject();
+                  .catch((response) => {
+                    reject(response);
                   });
               })
               .catch(error => {
@@ -128,11 +128,11 @@ const auth = {
             dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
               .then(() => {
                 dispatch('fetchProfile')
-                  .then(() => {
-                    resolve()
+                  .then((response) => {
+                    resolve(response)
                   })
-                  .catch(() => {
-                    reject();
+                  .catch((response) => {
+                    reject(response);
                   });
               })
               .catch(error => {
