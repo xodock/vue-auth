@@ -20,7 +20,7 @@ const Login = {
     clientId: null,
     clientSecret: null,
     patchInstance() {
-        return this.httpInstance = this.httpDriver.patchInstance(Login.store.getters.accessToken);
+        return this.httpInstance = this.httpDriver.patchInstance();
     },
     patchStore(store) {
         if (!store)
@@ -81,13 +81,13 @@ let Plugin = {
     install(Vue, {store, axios, http, httpDriver, client_id, client_secret, loginURL, refreshURL, logoutURL, profileFetchURL, usernameField, passwordField, processProfileResponse}) {
         if (axios) {
             Login.httpInstance = axios;
-            Login.httpDriver = axiosHttpDriver(Login.httpInstance);
+            Login.httpDriver = axiosHttpDriver(store, Login.httpInstance);
         } else if (http) {
             Login.httpInstance = http;
             if (!httpDriver)
-                Login.httpDriver = axiosHttpDriver(Login.httpInstance);
+                Login.httpDriver = axiosHttpDriver(store, Login.httpInstance);
             else
-                Login.httpDriver = httpDriver(Login.httpInstance);
+                Login.httpDriver = httpDriver(store, Login.httpInstance);
         }
         if (true) {//TODO:: implement driver definition logic
             Login.persistDriver = localStoragePersistDriver;

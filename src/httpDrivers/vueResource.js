@@ -1,12 +1,12 @@
-const constructor = function (instance) {
+const constructor = function (store, instance) {
     if (!instance)
         throw new Error("Please, provide a valid vue-resource instance!");
     return {
-        patchInstance(accessToken) {
-            if (accessToken)
-                instance.headers.common['Authorization'] = 'Bearer ' + accessToken;
-            else
-                delete instance.headers.common.Authorization;
+        patchInstance() {
+            instance.interceptors.push(function (request) {
+                if (store.getters.accessToken)
+                    request.headers.set('Authorization', 'Bearer ' + store.getters.accessToken);
+            });
             return instance;
         },
 

@@ -1,10 +1,10 @@
-const constructor = function (instance) {
+const constructor = function (store, instance) {
     if (!instance)
         throw new Error("Please, provide a valid vue-resource instance!");
     return {
-        patchInstance(accessToken) {
-            if (accessToken)
-                instance.defaults.headers.Authorization = "Bearer " + accessToken;
+        patchInstance() {
+            if (store.getters.accessToken)
+                instance.defaults.headers.Authorization = "Bearer " + store.getters.accessToken;
             else
                 delete instance.defaults.headers.Authorization;
             return instance;

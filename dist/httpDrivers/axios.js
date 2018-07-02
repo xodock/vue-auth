@@ -3,11 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-var constructor = function constructor(instance) {
+var constructor = function constructor(store, instance) {
     if (!instance) throw new Error("Please, provide a valid vue-resource instance!");
     return {
-        patchInstance: function patchInstance(accessToken) {
-            if (accessToken) instance.defaults.headers.Authorization = "Bearer " + accessToken;else delete instance.defaults.headers.Authorization;
+        patchInstance: function patchInstance() {
+            if (store.getters.accessToken) instance.defaults.headers.Authorization = "Bearer " + store.getters.accessToken;else delete instance.defaults.headers.Authorization;
             return instance;
         },
         responseData: function responseData(response) {

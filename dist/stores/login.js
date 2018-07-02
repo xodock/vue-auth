@@ -54,7 +54,7 @@ var auth = {
     mutations: {
         setAccessToken: function setAccessToken(state, access_token) {
             state.access_token = access_token;
-            _vue2.default.login.patchInstance(access_token);
+            _vue2.default.login.patchInstance();
         },
         setRefreshToken: function setRefreshToken(state, refresh_token) {
             state.refresh_token = refresh_token;
