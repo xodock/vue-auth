@@ -84,11 +84,11 @@ let Plugin = {
             Login.httpDriver = axiosHttpDriver(Login.httpInstance);
         } else if (http) {
             Login.httpInstance = http;
+            if (!httpDriver)
+                Login.httpDriver = axiosHttpDriver(Login.httpInstance);
+            else
+                Login.httpDriver = httpDriver(Login.httpInstance);
         }
-        if (!httpDriver)
-            Login.httpDriver = axiosHttpDriver(Login.httpInstance);
-        else
-            Login.httpDriver = httpDriver(Login.httpInstance);
         if (true) {//TODO:: implement driver definition logic
             Login.persistDriver = localStoragePersistDriver;
         }
