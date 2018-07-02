@@ -42,7 +42,7 @@ var Login = {
     clientId: null,
     clientSecret: null,
     patchInstance: function patchInstance() {
-        return this.httpInstance = this.httpDriver.patchInstance(Login.store.getters.accessToken);
+        return this.httpInstance = this.httpDriver.patchInstance();
     },
     patchStore: function patchStore(store) {
         if (!store) throw new Error("Please, provide Vuex store");
@@ -127,10 +127,10 @@ var Plugin = {
 
         if (axios) {
             Login.httpInstance = axios;
-            Login.httpDriver = (0, _axios2.default)(Login.httpInstance);
+            Login.httpDriver = (0, _axios2.default)(store, Login.httpInstance);
         } else if (http) {
             Login.httpInstance = http;
-            if (!httpDriver) Login.httpDriver = (0, _axios2.default)(Login.httpInstance);else Login.httpDriver = httpDriver(Login.httpInstance);
+            if (!httpDriver) Login.httpDriver = (0, _axios2.default)(store, Login.httpInstance);else Login.httpDriver = httpDriver(store, Login.httpInstance);
         }
         if (true) {
             //TODO:: implement driver definition logic
