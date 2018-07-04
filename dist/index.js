@@ -152,9 +152,9 @@ var Plugin = {
         Login.setFieldNames({ usernameField: usernameField, passwordField: passwordField });
         Login.setAPICredentials({ client_id: client_id, client_secret: client_secret });
         Vue.prototype.$login = Vue.login = Login;
-        if (Vue.login.store.getters.isLoggedIn) {
-            Login.refresh();
-        }
+        // if (Vue.login.store.getters.isLoggedIn) {
+        //     Login.refresh();
+        // }
         Vue.mixin({
             computed: _extends({}, Login.mapLoginGetters())
         });
