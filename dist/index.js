@@ -37,6 +37,7 @@ var Login = {
     logoutURL: null,
     profileFetchURL: null,
     processProfileResponse: null,
+    afterTokenChange: null,
     usernameField: null,
     passwordField: null,
     clientId: null,
@@ -123,7 +124,8 @@ var Plugin = {
             profileFetchURL = _ref4.profileFetchURL,
             usernameField = _ref4.usernameField,
             passwordField = _ref4.passwordField,
-            processProfileResponse = _ref4.processProfileResponse;
+            processProfileResponse = _ref4.processProfileResponse,
+            afterTokenChange = _ref4.afterTokenChange;
 
         if (axios) {
             Login.httpInstance = axios;
@@ -143,6 +145,7 @@ var Plugin = {
         Login.processProfileResponse = typeof processProfileResponse !== 'undefined' ? processProfileResponse : function (response) {
             return Login.httpDriver.responseData(response).data;
         };
+        Login.afterTokenChange = typeof afterTokenChange !== 'undefined' ? afterTokenChange : function () {};
         Login.patchStore(store);
         Login.patchInstance();
         Login.setURLs({ loginURL: loginURL, refreshURL: refreshURL, logoutURL: logoutURL, profileFetchURL: profileFetchURL });

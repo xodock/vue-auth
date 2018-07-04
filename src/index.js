@@ -15,6 +15,7 @@ const Login = {
     logoutURL: null,
     profileFetchURL: null,
     processProfileResponse: null,
+    afterTokenChange: null,
     usernameField: null,
     passwordField: null,
     clientId: null,
@@ -78,7 +79,7 @@ const Login = {
     }
 };
 let Plugin = {
-    install(Vue, {store, axios, http, httpDriver, client_id, client_secret, loginURL, refreshURL, logoutURL, profileFetchURL, usernameField, passwordField, processProfileResponse}) {
+    install(Vue, {store, axios, http, httpDriver, client_id, client_secret, loginURL, refreshURL, logoutURL, profileFetchURL, usernameField, passwordField, processProfileResponse, afterTokenChange}) {
         if (axios) {
             Login.httpInstance = axios;
             Login.httpDriver = axiosHttpDriver(store, Login.httpInstance);
@@ -96,6 +97,8 @@ let Plugin = {
             Login.apiDriver = passportApiDriver;
         }
         Login.processProfileResponse = (typeof processProfileResponse !== 'undefined') ? processProfileResponse : ((response) => Login.httpDriver.responseData(response).data);
+        Login.afterTokenChange = (typeof afterTokenChange !== 'undefined') ? afterTokenChange : (() => {
+        });
         Login.patchStore(store);
         Login.patchInstance();
         Login.setURLs({loginURL, refreshURL, logoutURL, profileFetchURL});
