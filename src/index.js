@@ -28,7 +28,8 @@ const Login = {
             throw new Error("Please, provide Vuex store");
         this.store = store;
         this.store.registerModule('login', VueLoginStoreModule);
-        this.persistDriver.patchStore(this.store, 'login');
+        if (this.persistDriver)
+            this.persistDriver.patchStore(this.store, 'login');
         return this.store;
     },
     setURLs({loginURL, refreshURL, logoutURL, profileFetchURL}) {
@@ -79,7 +80,7 @@ const Login = {
     }
 };
 let Plugin = {
-    install(Vue, {store, axios, http, httpDriver, client_id, client_secret, loginURL, refreshURL, logoutURL, profileFetchURL, usernameField, passwordField, processProfileResponse, afterTokenChange}) {
+    install(Vue, {store, axios, http, httpDriver, client_id, client_secret, loginURL, refreshURL, logoutURL, profileFetchURL, usernameField, passwordField, processProfileResponse, afterTokenChange, persist}) {
         if (axios) {
             Login.httpInstance = axios;
             Login.httpDriver = axiosHttpDriver(store, Login.httpInstance);
@@ -90,7 +91,7 @@ let Plugin = {
             else
                 Login.httpDriver = httpDriver(store, Login.httpInstance);
         }
-        if (true) {//TODO:: implement driver definition logic
+        if (persist) {//TODO:: implement driver definition logic
             Login.persistDriver = localStoragePersistDriver;
         }
         if (true) {//TODO:: implement driver definition logic
