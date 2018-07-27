@@ -85,6 +85,9 @@ var Login = {
             return Login.apiDriver.login(username, password, Login.clientId, Login.clientSecret, Login.loginURL, method);
         },
         logout: function logout(accessToken, method) {
+            if (!Login.logout) {
+                return new Promise.resolve();
+            }
             return Login.apiDriver.logout(accessToken, Login.logoutURL, method);
         },
         refresh: function refresh(refreshToken, method) {
@@ -122,6 +125,7 @@ var Plugin = {
             loginURL = _ref4.loginURL,
             refreshURL = _ref4.refreshURL,
             logoutURL = _ref4.logoutURL,
+            logout = _ref4.logout,
             profileFetchURL = _ref4.profileFetchURL,
             usernameField = _ref4.usernameField,
             passwordField = _ref4.passwordField,
@@ -129,6 +133,7 @@ var Plugin = {
             afterTokenChange = _ref4.afterTokenChange,
             persist = _ref4.persist;
 
+        Login.logout = !!(typeof logout === "undefined" ? true : logout);
         if (axios) {
             Login.httpInstance = axios;
             Login.httpDriver = (0, _axios2.default)(store, Login.httpInstance);
