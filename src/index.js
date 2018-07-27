@@ -53,7 +53,7 @@ const Login = {
             return Login.apiDriver.login(username, password, Login.clientId, Login.clientSecret, Login.loginURL, method)
         },
         logout(accessToken, method) {
-            if (!Login.logout){
+            if (!Login.logout) {
                 return new Promise.resolve();
             }
             return Login.apiDriver.logout(accessToken, Login.logoutURL, method)
@@ -80,6 +80,9 @@ const Login = {
     },
     getAxiosInstance() {
         return Login.httpInstance;
+    },
+    setAuthInfo(tokenResponse) {
+        return Login.store.dispatch('setAuthInfo', Login.apiDriver.parseTokenResponse(Login.httpDriver.responseData(tokenResponse)));
     }
 };
 let Plugin = {

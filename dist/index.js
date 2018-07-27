@@ -112,6 +112,9 @@ var Login = {
     },
     getAxiosInstance: function getAxiosInstance() {
         return Login.httpInstance;
+    },
+    setAuthInfo: function setAuthInfo(tokenResponse) {
+        return Login.store.dispatch('setAuthInfo', Login.apiDriver.parseTokenResponse(Login.httpDriver.responseData(tokenResponse)));
     }
 };
 var Plugin = {
