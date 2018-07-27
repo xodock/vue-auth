@@ -53,6 +53,7 @@ const Login = {
             return Login.apiDriver.login(username, password, Login.clientId, Login.clientSecret, Login.loginURL, method)
         },
         logout(accessToken, method) {
+
             return Login.apiDriver.logout(accessToken, Login.logoutURL, method)
         },
         refresh(refreshToken, method) {
@@ -80,7 +81,8 @@ const Login = {
     }
 };
 let Plugin = {
-    install(Vue, {store, axios, http, httpDriver, client_id, client_secret, loginURL, refreshURL, logoutURL, profileFetchURL, usernameField, passwordField, processProfileResponse, afterTokenChange, persist}) {
+    install(Vue, {store, axios, http, httpDriver, client_id, client_secret, loginURL, refreshURL, logoutURL, logout, profileFetchURL, usernameField, passwordField, processProfileResponse, afterTokenChange, persist}) {
+        Login.logout = !!(typeof logout === "undefined" ? true : logout);
         if (axios) {
             Login.httpInstance = axios;
             Login.httpDriver = axiosHttpDriver(store, Login.httpInstance);
