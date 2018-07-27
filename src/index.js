@@ -43,8 +43,8 @@ const Login = {
         this.passwordField = passwordField || 'password';
     },
     setAPICredentials({client_id, client_secret}) {
-        if (!client_id || !client_secret)
-            throw new Error("You should provide client Id and client secret");
+        // if (!client_id || !client_secret)
+        //     throw new Error("You should provide client Id and client secret");
         this.clientId = client_id;
         this.clientSecret = client_secret;
     },
@@ -91,7 +91,7 @@ let Plugin = {
             else
                 Login.httpDriver = httpDriver(store, Login.httpInstance);
         }
-        if (persist) {//TODO:: implement driver definition logic
+        if (typeof persist === "undefined" || (persist === true)) {//TODO:: implement driver definition logic
             Login.persistDriver = localStoragePersistDriver;
         }
         if (true) {//TODO:: implement driver definition logic
