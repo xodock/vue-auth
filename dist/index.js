@@ -49,7 +49,7 @@ var Login = {
         if (!store) throw new Error("Please, provide Vuex store");
         this.store = store;
         this.store.registerModule('login', _login2.default);
-        this.persistDriver.patchStore(this.store, 'login');
+        if (this.persistDriver) this.persistDriver.patchStore(this.store, 'login');
         return this.store;
     },
     setURLs: function setURLs(_ref) {
@@ -74,7 +74,8 @@ var Login = {
         var client_id = _ref3.client_id,
             client_secret = _ref3.client_secret;
 
-        if (!client_id || !client_secret) throw new Error("You should provide client Id and client secret");
+        // if (!client_id || !client_secret)
+        //     throw new Error("You should provide client Id and client secret");
         this.clientId = client_id;
         this.clientSecret = client_secret;
     },
@@ -125,7 +126,8 @@ var Plugin = {
             usernameField = _ref4.usernameField,
             passwordField = _ref4.passwordField,
             processProfileResponse = _ref4.processProfileResponse,
-            afterTokenChange = _ref4.afterTokenChange;
+            afterTokenChange = _ref4.afterTokenChange,
+            persist = _ref4.persist;
 
         if (axios) {
             Login.httpInstance = axios;
@@ -134,7 +136,7 @@ var Plugin = {
             Login.httpInstance = http;
             if (!httpDriver) Login.httpDriver = (0, _axios2.default)(store, Login.httpInstance);else Login.httpDriver = httpDriver(store, Login.httpInstance);
         }
-        if (true) {
+        if (typeof persist === "undefined" || persist === true) {
             //TODO:: implement driver definition logic
             Login.persistDriver = _localStorage2.default;
         }
