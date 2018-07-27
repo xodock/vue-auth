@@ -63,13 +63,19 @@ const auth = {
         }
     },
     actions: {
-        setAuthInfo({commit}, {access_token, refresh_token, expires_in, issued_at}) {
+        setAuthInfo({commit, dispatch}, {access_token, refresh_token, expires_in, issued_at}) {
             return new Promise((resolve, reject) => {
                 commit('setAccessToken', access_token);
                 commit('setRefreshToken', refresh_token);
                 commit('setExpiresIn', expires_in);
                 commit('setIssuedAt', issued_at);
-                resolve()
+                dispatch('fetchProfile')
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(() => {
+                        reject();
+                    });
             })
         },
         clearAuthInfo({commit}) {
@@ -110,15 +116,16 @@ const auth = {
                 Vue.login.requests.login(username, password)
                     .then((response) => {
                         dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
-                            .then(() => {
-                                dispatch('fetchProfile')
-                                    .then(() => {
-                                        resolve();
-                                    })
-                                    .catch(() => {
-                                        reject();
-                                    });
-                            })
+                            .then(
+                                () => {
+                                    resolve();
+                                },
+                                () => {
+                                    dispatch('logout')
+                                        .then(() => {
+                                            reject()
+                                        });
+                                })
                             .catch(error => {
                                 console.log(error);
                                 dispatch('logout').then(() => {
@@ -139,15 +146,16 @@ const auth = {
                 Vue.login.requests.refresh(getters.refreshToken)
                     .then((response) => {
                         dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
-                            .then(() => {
-                                dispatch('fetchProfile')
-                                    .then(() => {
-                                        resolve()
-                                    })
-                                    .catch(() => {
-                                        reject();
-                                    });
-                            })
+                            .then(
+                                () => {
+                                    resolve();
+                                },
+                                () => {
+                                    dispatch('logout')
+                                        .then(() => {
+                                            reject()
+                                        });
+                                })
                             .catch(error => {
                                 console.warn(error);
                                 dispatch('logout').then(() => {

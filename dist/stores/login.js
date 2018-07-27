@@ -72,7 +72,8 @@ var auth = {
     },
     actions: {
         setAuthInfo: function setAuthInfo(_ref, _ref2) {
-            var commit = _ref.commit;
+            var commit = _ref.commit,
+                dispatch = _ref.dispatch;
             var access_token = _ref2.access_token,
                 refresh_token = _ref2.refresh_token,
                 expires_in = _ref2.expires_in,
@@ -83,7 +84,11 @@ var auth = {
                 commit('setRefreshToken', refresh_token);
                 commit('setExpiresIn', expires_in);
                 commit('setIssuedAt', issued_at);
-                resolve();
+                dispatch('fetchProfile').then(function () {
+                    resolve();
+                }).catch(function () {
+                    reject();
+                });
             });
         },
         clearAuthInfo: function clearAuthInfo(_ref3) {
@@ -128,9 +133,9 @@ var auth = {
             return new Promise(function (resolve, reject) {
                 _vue2.default.login.requests.login(username, password).then(function (response) {
                     dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(function () {
-                        dispatch('fetchProfile').then(function () {
-                            resolve();
-                        }).catch(function () {
+                        resolve();
+                    }, function () {
+                        dispatch('logout').then(function () {
                             reject();
                         });
                     }).catch(function (error) {
@@ -155,9 +160,9 @@ var auth = {
             return new Promise(function (resolve, reject) {
                 _vue2.default.login.requests.refresh(getters.refreshToken).then(function (response) {
                     dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(function () {
-                        dispatch('fetchProfile').then(function () {
-                            resolve();
-                        }).catch(function () {
+                        resolve();
+                    }, function () {
+                        dispatch('logout').then(function () {
                             reject();
                         });
                     }).catch(function (error) {
