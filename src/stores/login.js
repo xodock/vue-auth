@@ -64,101 +64,71 @@ const auth = {
     },
     actions: {
         setAuthInfo({commit, dispatch}, {access_token, refresh_token, expires_in, issued_at}) {
-            return new Promise((resolve) => {
-                commit('setAccessToken', access_token);
-                commit('setRefreshToken', refresh_token);
-                commit('setExpiresIn', expires_in);
-                commit('setIssuedAt', issued_at);
-                dispatch('fetchProfile')
-                    .then(() => {
-                        resolve();
-                    })
-            })
+            commit('setAccessToken', access_token);
+            commit('setRefreshToken', refresh_token);
+            commit('setExpiresIn', expires_in);
+            commit('setIssuedAt', issued_at);
+            return dispatch('fetchProfile')
         },
         clearAuthInfo({commit}) {
-            return new Promise((resolve) => {
-                commit('setAccessToken', null);
-                commit('setRefreshToken', null);
-                commit('setExpiresIn', null);
-                commit('setIssuedAt', null);
-                commit('setProfile', {});
-                resolve();
-            })
+            commit('setAccessToken', null);
+            commit('setRefreshToken', null);
+            commit('setExpiresIn', null);
+            commit('setIssuedAt', null);
+            commit('setProfile', {});
+            return Promise.resolve();
         },
         logout({commit, dispatch, getters}) {
-            return new Promise((resolve) => {
-                Vue.login.requests.logout(getters.accessToken)
-                    .then(() => {
-                            dispatch('clearAuthInfo')
-                                .then(() => {
-                                    resolve();
-                                });
-                        },
-                        () => {
-                            dispatch('clearAuthInfo')
-                                .then(() => {
-                                    resolve();
-                                });
-                        })
-                    .catch(() => {
-                        dispatch('clearAuthInfo')
-                            .then(() => {
-                                resolve();
-                            });
-                    })
-            });
+            return Vue.login.requests.logout(getters.accessToken)
+                .then(() => dispatch('clearAuthInfo'))
+                .catch(() => dispatch('clearAuthInfo'))
         },
         login({commit, dispatch}, {username, password}) {
-            return new Promise((resolve, reject) => {
-                Vue.login.requests.login(username, password)
-                    .then((response) => {
-                        dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
-                            .then(resolve)
-                            .catch(error => {
-                                console.error(error);
-                                dispatch('logout').then(reject);
-                            });
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        dispatch('logout').then(reject);
-                    });
-            });
+            return Vue.login.requests.login(username, password)
+                .then(response => dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response))))
+                .catch(error => {
+                    dispatch('logout')
+                        .then(() => {
+                            throw error;
+                        })
+                        .catch(() => {
+                            throw error;
+                        });
+                })
         },
         authRefresh({commit, dispatch, getters}) {
-            return new Promise((resolve, reject) => {
-                Vue.login.requests.refresh(getters.refreshToken)
-                    .then((response) => {
-                        dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
-                            .then(resolve)
-                            .catch(error => {
-                                console.error(error);
-                                dispatch('logout').then(reject);
-                            });
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        dispatch('logout').then(reject);
-                    });
-            });
+            return Vue.login.requests.refresh(getters.refreshToken)
+                .then(response => dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response))))
+                .catch(error => {
+                    dispatch('logout')
+                        .then(() => {
+                            throw error;
+                        })
+                        .catch(() => {
+                            throw error;
+                        });
+                })
         },
         fetchProfile({commit, dispatch}) {
-            return new Promise((resolve, reject) => {
-                Vue.login.requests.fetchProfile()
-                    .then(response => {
-                        let profile = Vue.login.processProfileResponse(response);
-                        if (profile) {
-                            commit('setProfile', profile);
-                            resolve(profile);
-                        } else {
-                            reject(response)
-                        }
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        dispatch('logout').then(reject);
-                    });
-            });
+            return Vue.login.requests.fetchProfile()
+                .then(response => {
+                    let profile = Vue.login.processProfileResponse(response);
+                    if (profile) {
+                        commit('setProfile', profile);
+                        return Promise.resolve(profile);
+                    } else {
+                        throw new Error('Profile fetch failed. Response:' + JSON.stringify(response));
+                    }
+                })
+                .catch(error => {
+                    dispatch('logout')
+                        .then(() => {
+                            throw error;
+                        })
+                        .catch(() => {
+                            throw error;
+                        });
+                })
         }
     }
 };

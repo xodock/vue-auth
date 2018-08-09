@@ -79,47 +79,31 @@ var auth = {
                 expires_in = _ref2.expires_in,
                 issued_at = _ref2.issued_at;
 
-            return new Promise(function (resolve) {
-                commit('setAccessToken', access_token);
-                commit('setRefreshToken', refresh_token);
-                commit('setExpiresIn', expires_in);
-                commit('setIssuedAt', issued_at);
-                dispatch('fetchProfile').then(function () {
-                    resolve();
-                });
-            });
+            commit('setAccessToken', access_token);
+            commit('setRefreshToken', refresh_token);
+            commit('setExpiresIn', expires_in);
+            commit('setIssuedAt', issued_at);
+            return dispatch('fetchProfile');
         },
         clearAuthInfo: function clearAuthInfo(_ref3) {
             var commit = _ref3.commit;
 
-            return new Promise(function (resolve) {
-                commit('setAccessToken', null);
-                commit('setRefreshToken', null);
-                commit('setExpiresIn', null);
-                commit('setIssuedAt', null);
-                commit('setProfile', {});
-                resolve();
-            });
+            commit('setAccessToken', null);
+            commit('setRefreshToken', null);
+            commit('setExpiresIn', null);
+            commit('setIssuedAt', null);
+            commit('setProfile', {});
+            return Promise.resolve();
         },
         logout: function logout(_ref4) {
             var commit = _ref4.commit,
                 dispatch = _ref4.dispatch,
                 getters = _ref4.getters;
 
-            return new Promise(function (resolve) {
-                _vue2.default.login.requests.logout(getters.accessToken).then(function () {
-                    dispatch('clearAuthInfo').then(function () {
-                        resolve();
-                    });
-                }, function () {
-                    dispatch('clearAuthInfo').then(function () {
-                        resolve();
-                    });
-                }).catch(function () {
-                    dispatch('clearAuthInfo').then(function () {
-                        resolve();
-                    });
-                });
+            return _vue2.default.login.requests.logout(getters.accessToken).then(function () {
+                return dispatch('clearAuthInfo');
+            }).catch(function () {
+                return dispatch('clearAuthInfo');
             });
         },
         login: function login(_ref5, _ref6) {
@@ -128,15 +112,13 @@ var auth = {
             var username = _ref6.username,
                 password = _ref6.password;
 
-            return new Promise(function (resolve, reject) {
-                _vue2.default.login.requests.login(username, password).then(function (response) {
-                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(resolve).catch(function (error) {
-                        console.error(error);
-                        dispatch('logout').then(reject);
-                    });
-                }).catch(function (error) {
-                    console.error(error);
-                    dispatch('logout').then(reject);
+            return _vue2.default.login.requests.login(username, password).then(function (response) {
+                return dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response)));
+            }).catch(function (error) {
+                dispatch('logout').then(function () {
+                    throw error;
+                }).catch(function () {
+                    throw error;
                 });
             });
         },
@@ -145,15 +127,13 @@ var auth = {
                 dispatch = _ref7.dispatch,
                 getters = _ref7.getters;
 
-            return new Promise(function (resolve, reject) {
-                _vue2.default.login.requests.refresh(getters.refreshToken).then(function (response) {
-                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(resolve).catch(function (error) {
-                        console.error(error);
-                        dispatch('logout').then(reject);
-                    });
-                }).catch(function (error) {
-                    console.error(error);
-                    dispatch('logout').then(reject);
+            return _vue2.default.login.requests.refresh(getters.refreshToken).then(function (response) {
+                return dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response)));
+            }).catch(function (error) {
+                dispatch('logout').then(function () {
+                    throw error;
+                }).catch(function () {
+                    throw error;
                 });
             });
         },
@@ -161,18 +141,19 @@ var auth = {
             var commit = _ref8.commit,
                 dispatch = _ref8.dispatch;
 
-            return new Promise(function (resolve, reject) {
-                _vue2.default.login.requests.fetchProfile().then(function (response) {
-                    var profile = _vue2.default.login.processProfileResponse(response);
-                    if (profile) {
-                        commit('setProfile', profile);
-                        resolve(profile);
-                    } else {
-                        reject(response);
-                    }
-                }).catch(function (error) {
-                    console.error(error);
-                    dispatch('logout').then(reject);
+            return _vue2.default.login.requests.fetchProfile().then(function (response) {
+                var profile = _vue2.default.login.processProfileResponse(response);
+                if (profile) {
+                    commit('setProfile', profile);
+                    return Promise.resolve(profile);
+                } else {
+                    throw new Error('Profile fetch failed. Response:' + JSON.stringify(response));
+                }
+            }).catch(function (error) {
+                dispatch('logout').then(function () {
+                    throw error;
+                }).catch(function () {
+                    throw error;
                 });
             });
         }
