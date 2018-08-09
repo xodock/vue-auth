@@ -54,7 +54,7 @@ const Login = {
         },
         logout(accessToken, method) {
             if (!Login.logout) {
-                return new Promise.resolve();
+                return Promise.resolve();
             }
             return Login.apiDriver.logout(accessToken, Login.logoutURL, method)
         },
