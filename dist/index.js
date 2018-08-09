@@ -153,7 +153,7 @@ var Plugin = {
             Login.apiDriver = _passport2.default;
         }
         Login.processProfileResponse = typeof processProfileResponse !== 'undefined' ? processProfileResponse : function (response) {
-            return Login.httpDriver.responseData(response).data;
+            return Login.httpDriver.responseData(response);
         };
         Login.afterTokenChange = typeof afterTokenChange !== 'undefined' ? afterTokenChange : function () {};
         Login.patchStore(store);

@@ -104,7 +104,7 @@ let Plugin = {
         if (true) {//TODO:: implement driver definition logic
             Login.apiDriver = passportApiDriver;
         }
-        Login.processProfileResponse = (typeof processProfileResponse !== 'undefined') ? processProfileResponse : ((response) => Login.httpDriver.responseData(response).data);
+        Login.processProfileResponse = (typeof processProfileResponse !== 'undefined') ? processProfileResponse : ((response) => Login.httpDriver.responseData(response));
         Login.afterTokenChange = (typeof afterTokenChange !== 'undefined') ? afterTokenChange : (() => {
         });
         Login.patchStore(store);
