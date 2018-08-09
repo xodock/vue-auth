@@ -64,7 +64,7 @@ const auth = {
     },
     actions: {
         setAuthInfo({commit, dispatch}, {access_token, refresh_token, expires_in, issued_at}) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 commit('setAccessToken', access_token);
                 commit('setRefreshToken', refresh_token);
                 commit('setExpiresIn', expires_in);
@@ -73,13 +73,10 @@ const auth = {
                     .then(() => {
                         resolve();
                     })
-                    .catch(() => {
-                        reject();
-                    });
             })
         },
         clearAuthInfo({commit}) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 commit('setAccessToken', null);
                 commit('setRefreshToken', null);
                 commit('setExpiresIn', null);
@@ -89,7 +86,7 @@ const auth = {
             })
         },
         logout({commit, dispatch, getters}) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 Vue.login.requests.logout(getters.accessToken)
                     .then(() => {
                             dispatch('clearAuthInfo')
@@ -116,28 +113,15 @@ const auth = {
                 Vue.login.requests.login(username, password)
                     .then((response) => {
                         dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
-                            .then(
-                                () => {
-                                    resolve();
-                                },
-                                () => {
-                                    dispatch('logout')
-                                        .then(() => {
-                                            reject()
-                                        });
-                                })
+                            .then(resolve)
                             .catch(error => {
-                                console.log(error);
-                                dispatch('logout').then(() => {
-                                    reject(error)
-                                });
+                                console.error(error);
+                                dispatch('logout').then(reject);
                             });
                     })
                     .catch(error => {
-                        console.log(error);
-                        dispatch('logout').then(() => {
-                            reject(error)
-                        });
+                        console.error(error);
+                        dispatch('logout').then(reject);
                     });
             });
         },
@@ -146,28 +130,15 @@ const auth = {
                 Vue.login.requests.refresh(getters.refreshToken)
                     .then((response) => {
                         dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
-                            .then(
-                                () => {
-                                    resolve();
-                                },
-                                () => {
-                                    dispatch('logout')
-                                        .then(() => {
-                                            reject()
-                                        });
-                                })
+                            .then(resolve)
                             .catch(error => {
-                                console.warn(error);
-                                dispatch('logout').then(() => {
-                                    reject(error)
-                                });
+                                console.error(error);
+                                dispatch('logout').then(reject);
                             });
                     })
                     .catch(error => {
-                        console.warn(error);
-                        dispatch('logout').then(() => {
-                            reject(error)
-                        });
+                        console.error(error);
+                        dispatch('logout').then(reject);
                     });
             });
         },
@@ -184,10 +155,8 @@ const auth = {
                         }
                     })
                     .catch(error => {
-                        console.warn(error);
-                        dispatch('logout').then(() => {
-                            reject(error)
-                        });
+                        console.error(error);
+                        dispatch('logout').then(reject);
                     });
             });
         }

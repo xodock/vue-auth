@@ -79,22 +79,20 @@ var auth = {
                 expires_in = _ref2.expires_in,
                 issued_at = _ref2.issued_at;
 
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 commit('setAccessToken', access_token);
                 commit('setRefreshToken', refresh_token);
                 commit('setExpiresIn', expires_in);
                 commit('setIssuedAt', issued_at);
                 dispatch('fetchProfile').then(function () {
                     resolve();
-                }).catch(function () {
-                    reject();
                 });
             });
         },
         clearAuthInfo: function clearAuthInfo(_ref3) {
             var commit = _ref3.commit;
 
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 commit('setAccessToken', null);
                 commit('setRefreshToken', null);
                 commit('setExpiresIn', null);
@@ -108,7 +106,7 @@ var auth = {
                 dispatch = _ref4.dispatch,
                 getters = _ref4.getters;
 
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 _vue2.default.login.requests.logout(getters.accessToken).then(function () {
                     dispatch('clearAuthInfo').then(function () {
                         resolve();
@@ -132,23 +130,13 @@ var auth = {
 
             return new Promise(function (resolve, reject) {
                 _vue2.default.login.requests.login(username, password).then(function (response) {
-                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(function () {
-                        resolve();
-                    }, function () {
-                        dispatch('logout').then(function () {
-                            reject();
-                        });
-                    }).catch(function (error) {
-                        console.log(error);
-                        dispatch('logout').then(function () {
-                            reject(error);
-                        });
+                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(resolve).catch(function (error) {
+                        console.error(error);
+                        dispatch('logout').then(reject);
                     });
                 }).catch(function (error) {
-                    console.log(error);
-                    dispatch('logout').then(function () {
-                        reject(error);
-                    });
+                    console.error(error);
+                    dispatch('logout').then(reject);
                 });
             });
         },
@@ -159,23 +147,13 @@ var auth = {
 
             return new Promise(function (resolve, reject) {
                 _vue2.default.login.requests.refresh(getters.refreshToken).then(function (response) {
-                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(function () {
-                        resolve();
-                    }, function () {
-                        dispatch('logout').then(function () {
-                            reject();
-                        });
-                    }).catch(function (error) {
-                        console.warn(error);
-                        dispatch('logout').then(function () {
-                            reject(error);
-                        });
+                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(resolve).catch(function (error) {
+                        console.error(error);
+                        dispatch('logout').then(reject);
                     });
                 }).catch(function (error) {
-                    console.warn(error);
-                    dispatch('logout').then(function () {
-                        reject(error);
-                    });
+                    console.error(error);
+                    dispatch('logout').then(reject);
                 });
             });
         },
@@ -193,10 +171,8 @@ var auth = {
                         reject(response);
                     }
                 }).catch(function (error) {
-                    console.warn(error);
-                    dispatch('logout').then(function () {
-                        reject(error);
-                    });
+                    console.error(error);
+                    dispatch('logout').then(reject);
                 });
             });
         }
