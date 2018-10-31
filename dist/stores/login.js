@@ -100,11 +100,14 @@ var auth = {
                 dispatch = _ref4.dispatch,
                 getters = _ref4.getters;
 
-            return _vue2.default.login.requests.logout(getters.accessToken).then(function () {
-                return dispatch('clearAuthInfo');
-            }).catch(function () {
-                return dispatch('clearAuthInfo');
+            return new Promise(function (resolve, reject) {
+                _vue2.default.login.requests.logout(getters.accessToken).then(function () {
+                    dispatch('clearAuthInfo').then(resolve);
+                }).catch(function () {
+                    dispatch('clearAuthInfo').then(resolve);
+                });
             });
+            // return
         },
         login: function login(_ref5, _ref6) {
             var commit = _ref5.commit,
@@ -112,13 +115,11 @@ var auth = {
             var username = _ref6.username,
                 password = _ref6.password;
 
-            return _vue2.default.login.requests.login(username, password).then(function (response) {
-                return dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response)));
-            }).catch(function (error) {
-                dispatch('logout').then(function () {
-                    throw error;
-                }).catch(function () {
-                    throw error;
+            return new Promise(function (resolve, reject) {
+                _vue2.default.login.requests.login(username, password).then(function (response) {
+                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(resolve);
+                }, reject).catch(function (error) {
+                    dispatch('logout').then(reject, reject).catch(reject);
                 });
             });
         },
