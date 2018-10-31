@@ -79,22 +79,33 @@ const auth = {
             return Promise.resolve();
         },
         logout({commit, dispatch, getters}) {
-            return Vue.login.requests.logout(getters.accessToken)
-                .then(() => dispatch('clearAuthInfo'))
-                .catch(() => dispatch('clearAuthInfo'))
+            return new Promise((resolve, reject) => {
+                Vue.login.requests.logout(getters.accessToken)
+                    .then(() => {
+                        dispatch('clearAuthInfo').then(resolve)
+                    })
+                    .catch(() => {
+                        dispatch('clearAuthInfo').then(resolve)
+                    })
+            });
+            // return
         },
         login({commit, dispatch}, {username, password}) {
-            return Vue.login.requests.login(username, password)
-                .then(response => dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response))))
-                .catch(error => {
-                    dispatch('logout')
-                        .then(() => {
-                            throw error;
-                        })
-                        .catch(() => {
-                            throw error;
-                        });
-                })
+            return new Promise((resolve, reject) => {
+                Vue.login.requests.login(username, password)
+                    .then(
+                        response => {
+                            dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
+                                .then(resolve)
+                        },
+                        reject
+                    )
+                    .catch(error => {
+                        dispatch('logout')
+                            .then(reject, reject)
+                            .catch(reject);
+                    });
+            });
         },
         authRefresh({commit, dispatch, getters}) {
             return Vue.login.requests.refresh(getters.refreshToken)
