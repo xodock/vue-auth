@@ -117,7 +117,9 @@ var auth = {
 
             return new Promise(function (resolve, reject) {
                 _vue2.default.login.requests.login(username, password).then(function (response) {
-                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(resolve);
+                    dispatch('setAuthInfo', _vue2.default.login.apiDriver.parseTokenResponse(_vue2.default.login.httpDriver.responseData(response))).then(function () {
+                        resolve(response);
+                    });
                 }, reject).catch(function (error) {
                     dispatch('logout').then(reject, reject).catch(reject);
                 });
