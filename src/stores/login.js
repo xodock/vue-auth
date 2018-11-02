@@ -96,7 +96,9 @@ const auth = {
                     .then(
                         response => {
                             dispatch('setAuthInfo', Vue.login.apiDriver.parseTokenResponse(Vue.login.httpDriver.responseData(response)))
-                                .then(resolve)
+                                .then(() => {
+                                    resolve(response)
+                                })
                         },
                         reject
                     )
