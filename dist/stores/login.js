@@ -26,10 +26,10 @@ var auth = {
             return state.refresh_token;
         },
         tokenIssuedAt: function tokenIssuedAt(state, getters) {
-            return state.issued_at;
+            return Number(state.issued_at);
         },
         tokenLifeTime: function tokenLifeTime(state, getters) {
-            return state.expires_in;
+            return Number(state.expires_in);
         },
         tokenExpiresAt: function tokenExpiresAt(state, getters) {
             if (!getters.tokenIssuedAt || !getters.tokenLifeTime) return 0;
